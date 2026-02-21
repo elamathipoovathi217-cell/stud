@@ -1,0 +1,5 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title or 'Student Performance System' }}</title>
+<style>body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f6f8fb;color:#1b2a4e}header{background:#1b2a4e;color:#fff;padding:12px 20px}.container{max-width:1100px;margin:20px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}th{background:#eef2ff}</style>
+</head><body><header><h2>Student Performance Analysis System</h2></header><div class="container">{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for c,m in messages %}<p><b>{{c}}</b>: {{m}}</p>{% endfor %}{% endif %}{% endwith %}{% block content %}{% endblock %}</div></body></html>

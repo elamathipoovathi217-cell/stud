@@ -5,6 +5,7 @@ from extensions import db
 from models import User, Student, Subject, TeacherSubject, Attendance, Marks, Risk, Exam, RoomAllocation
 from datetime import datetime, date
 from sqlalchemy import and_
+from services.risk_analysis import evaluate_student_risk
 
 teacher_bp = Blueprint('teacher', __name__)
 
@@ -13,7 +14,11 @@ teacher_bp = Blueprint('teacher', __name__)
 @teacher_required
 def dashboard():
     """Teacher dashboard"""
-    return render_template('teacher/dashboard.html')
+    teacher_subjects = TeacherSubject.query.filter_by(teacher_id=current_user.id, is_active=True).all()
+    subject_ids = [ts.subject_id for ts in teacher_subjects]
+    marks_rows = Marks.query.filter(Marks.subject_id.in_(subject_ids)).all() if subject_ids else []
+    avg_score = (sum((m.total_marks or 0) for m in marks_rows) / len(marks_rows)) if marks_rows else 0
+    return render_template('teacher/dashboard.html', teacher_subjects=teacher_subjects, avg_score=avg_score)
 
 @teacher_bp.route('/mark-attendance', methods=['GET', 'POST'])
 @login_required
@@ -84,7 +89,8 @@ def add_marks():
             
             if not marks.id:
                 db.session.add(marks)
-        
+            evaluate_student_risk(student_id)
+
         db.session.commit()
         flash('Marks added successfully', 'success')
         return redirect(url_for('teacher.add_marks'))
@@ -131,7 +137,9 @@ def ai_risk_alerts():
 def student_analysis(student_id):
     """Analyze individual student"""
     student = Student.query.get_or_404(student_id)
-    return render_template('teacher/student_analysis.html', student=student)
+    marks = Marks.query.filter_by(student_id=student_id).all()
+    risk = Risk.query.filter_by(student_id=student_id).order_by(Risk.predicted_at.desc()).first()
+    return render_template('teacher/student_analysis.html', student=student, marks=marks, risk=risk)
 
 @teacher_bp.route('/class-performance')
 @login_required
@@ -146,7 +154,9 @@ def class_performance():
 def subject_analysis(subject_id):
     """Analyze subject performance"""
     subject = Subject.query.get_or_404(subject_id)
-    return render_template('teacher/subject_analysis.html', subject=subject)
+    marks = Marks.query.filter_by(subject_id=subject_id).all()
+    avg = (sum((m.total_marks or 0) for m in marks) / len(marks)) if marks else 0
+    return render_template('teacher/subject_analysis.html', subject=subject, marks=marks, avg=avg)
 
 @teacher_bp.route('/improvement-suggestions')
 @login_required

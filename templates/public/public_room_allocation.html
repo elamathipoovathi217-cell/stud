@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h3>Public Room Allocation</h3>{% for exam in exams %}<p>{{exam.name}} - {{exam.exam_date}}</p>{% else %}<p>No allocations.</p>{% endfor %}{% endblock %}

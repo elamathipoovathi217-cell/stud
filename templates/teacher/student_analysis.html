@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h3>Student Analysis: {{ student.name }}</h3><p>Risk: {{ risk.risk_level if risk else 'N/A' }}</p><ul>{% for m in marks %}<li>{{m.subject.name if m.subject else '-'}}: {{m.total_marks}}</li>{% else %}<li>No marks found.</li>{% endfor %}</ul>{% endblock %}

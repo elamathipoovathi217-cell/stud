@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h3>Teacher Dashboard</h3><p>Average score across assigned subjects: {{ '%.2f'|format(avg_score) }}</p><ul>{% for ts in teacher_subjects %}<li>{{ ts.subject.name if ts.subject else 'Subject' }}</li>{% else %}<li>No assigned subjects.</li>{% endfor %}</ul>{% endblock %}

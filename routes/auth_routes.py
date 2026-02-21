@@ -22,12 +22,19 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        department_name = request.form.get('department', '').strip()
         remember = True if request.form.get('remember') else False
-        
-        # Find user by username or email
+
+        # Find user by username/email, or by student registration number + department
         user = User.query.filter(
             (User.username == username) | (User.email == username)
         ).first()
+        if not user:
+            student_query = Student.query.filter_by(registration_number=username)
+            if department_name:
+                student_query = student_query.join(Department).filter(Department.name == department_name)
+            student = student_query.first()
+            user = student.user_account if student else None
         
         if user and check_password_hash(user.password_hash, password):
             if not user.is_active:

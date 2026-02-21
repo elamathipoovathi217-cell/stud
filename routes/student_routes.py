@@ -13,7 +13,19 @@ student_bp = Blueprint('student', __name__)
 def dashboard():
     """Student dashboard"""
     student = current_user.student_record
-    return render_template('student/dashboard.html', student=student)
+    marks = Marks.query.filter_by(student_id=student.id).all()
+    risk = Risk.query.filter_by(student_id=student.id).order_by(Risk.predicted_at.desc()).first()
+    current_avg = (sum((m.total_marks or 0) for m in marks) / len(marks)) if marks else 0
+    target = 15
+    improvement_needed = max(0, target - current_avg)
+    return render_template(
+        'student/dashboard.html',
+        student=student,
+        marks=marks,
+        risk=risk,
+        current_avg=current_avg,
+        improvement_needed=improvement_needed,
+    )
 
 @student_bp.route('/performance-report')
 @login_required
@@ -57,7 +69,11 @@ def risk_status():
 def improvement_plan():
     """View improvement plan"""
     student = current_user.student_record
-    return render_template('student/improvement_plan.html', student=student)
+    marks = Marks.query.filter_by(student_id=student.id).all()
+    current_avg = (sum((m.total_marks or 0) for m in marks) / len(marks)) if marks else 0
+    target = 15
+    improvement_needed = max(0, target - current_avg)
+    return render_template('student/improvement_plan.html', student=student, current_avg=current_avg, improvement_needed=improvement_needed)
 
 @student_bp.route('/ai-recommendations')
 @login_required

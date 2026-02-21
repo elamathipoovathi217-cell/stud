@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h3>Announcements</h3><ul>{% for n in announcements %}<li>{{n.title}} - {{n.message}}</li>{% else %}<li>No announcements.</li>{% endfor %}</ul>{% endblock %}
