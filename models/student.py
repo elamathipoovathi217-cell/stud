@@ -1,5 +1,9 @@
 from extensions import db
 from datetime import datetime
+from .attendance import Attendance
+from .subject import Subject
+from .marks import Marks
+from .risk import Risk
 
 class Student(db.Model):
     __tablename__ = 'students'

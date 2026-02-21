@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h3>Public Invigilator Assignment</h3>{% for a in allocations %}<p>{{a.exam.name if a.exam else '-'}} | {{a.teacher.full_name if a.teacher else '-'}} | {{a.room_allocation.room_number if a.room_allocation else '-'}}</p>{% else %}<p>No invigilation allocations.</p>{% endfor %}{% endblock %}
